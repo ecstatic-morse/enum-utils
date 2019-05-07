@@ -1,0 +1,19 @@
+[package]
+name = "enum-utils-bench"
+version = "0.1.0"
+authors = ["Dylan MacKenzie <ecstaticmorse@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+criterion = "0.2.11"
+rand = "0.6.5"
+phf = "0.7.24"
+libc = "0.2.54"
+
+[build-dependencies]
+quote = "0.6.12"
+phf_codegen = "0.7.24"
+enum-utils-from-str = { path = "../from-str" }
+cc = "1.0.36"
+proc-macro2 = "0.4.29"
+

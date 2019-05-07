@@ -1,0 +1,16 @@
+[package]
+name = "enum-utils-from-str"
+version = "0.1.0"
+authors = ["Dylan MacKenzie <ecstaticmorse@gmail.com>"]
+edition = "2018"
+
+description = "Code generation for mapping from strings to arbitrary values"
+repository = "https://github.com/ecstatic-morse/enum-utils"
+readme = "../README.md"
+license = "MIT"
+tags = ["enum", "proc-macro", "derive"]
+categories = ["development-tools"]
+
+[dependencies]
+proc-macro2 = "0.4.29"
+quote = "0.6.12"

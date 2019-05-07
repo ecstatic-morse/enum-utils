@@ -1,0 +1,29 @@
+[package]
+name = "enum-utils"
+version = "0.1.0"
+authors = ["Dylan MacKenzie <ecstaticmorse@gmail.com>"]
+edition = "2018"
+
+description = "A set of useful proc macros for enums"
+repository = "https://github.com/ecstatic-morse/enum-utils"
+readme = "README.md"
+license = "MIT"
+tags = ["enum", "proc-macro", "derive"]
+categories = ["development-tools"]
+
+[workspace]
+members = [
+  "bench",
+  "from-str",
+]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+failure = "0.1.5"
+proc-macro2 = "0.4.29"
+quote = "0.6.12"
+enum-utils-from-str = { path = "from-str", version = "0.1.0" }
+serde_derive_internals = "0.24.1"
+syn = "0.15.33"
