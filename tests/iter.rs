@@ -1,4 +1,7 @@
+#![feature(repr_align_enum)]
+
 use enum_utils::IterVariants;
+
 
 #[derive(Debug, IterVariants, PartialEq, Eq)]
 #[repr(u32)]
@@ -34,4 +37,20 @@ enum Empty {}
 fn empty() {
     assert_eq!(Vec::<Empty>::new(),
                Empty::iter().collect::<Vec<Empty>>());
+}
+
+#[derive(Debug, IterVariants, PartialEq, Eq)]
+#[repr(C, u16)]
+#[repr(align(2))]
+enum MultiRepr {
+    A,
+    B,
+}
+
+#[test]
+fn multi_repr() {
+    use self::MultiRepr::*;
+
+    assert_eq!(vec![A, B],
+               MultiRepr::iter().collect::<Vec<_>>());
 }
