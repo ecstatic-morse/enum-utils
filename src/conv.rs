@@ -2,18 +2,22 @@ use failure::format_err;
 use proc_macro2::{TokenStream, Span};
 use quote::quote;
 
-use crate::attr::{Enum, ErrorList, reprs};
+use crate::attr::{Enum, ErrorList};
 
 pub fn derive_try_from_repr(input: &syn::DeriveInput) -> Result<TokenStream, ErrorList> {
-    let Enum { name, variants, .. } = Enum::parse(input)?;
-
-    let repr = match reprs(input.attrs.iter()).as_slice() {
-        [] => bail_list!("`#[repr(...)]` must be specified to derive `TryFrom`"),
-        [repr] => repr.clone(),
-        _ => bail_list!("`#[repr(...)]` is specified multiple times"),
-    };
+    let Enum { name, variants, primitive_repr, .. } = Enum::parse(input)?;
 
     let mut errors = ErrorList::new();
+    let repr = match primitive_repr {
+        Ok(Some((_, repr))) => repr,
+
+        Ok(None) => bail_list!("`#[repr(...)]` must be specified to derive `TryFrom`"),
+        Err(e) => {
+            errors.push_back(e);
+            return Err(errors);
+        }
+    };
+
     for (v, _) in variants.iter() {
         if v.fields != syn::Fields::Unit {
             errors.push_back(format_err!("Variant cannot have fields"));
@@ -62,15 +66,19 @@ pub fn derive_try_from_repr(input: &syn::DeriveInput) -> Result<TokenStream, Err
 }
 
 pub fn derive_repr_from(input: &syn::DeriveInput) -> Result<TokenStream, ErrorList> {
-    let Enum { name, variants, .. } = Enum::parse(input)?;
-
-    let repr = match reprs(input.attrs.iter()).as_slice() {
-        [] => bail_list!("`#[repr(...)]` must be specified to derive `TryFrom`"),
-        [repr] => repr.clone(),
-        _ => bail_list!("`#[repr(...)]` is specified multiple times"),
-    };
+    let Enum { name, variants, primitive_repr, .. } = Enum::parse(input)?;
 
     let mut errors = ErrorList::new();
+    let repr = match primitive_repr {
+        Ok(Some((_, repr))) => repr,
+
+        Ok(None) => bail_list!("`#[repr(...)]` must be specified to derive `TryFrom`"),
+        Err(e) => {
+            errors.push_back(e);
+            return Err(errors);
+        }
+    };
+
     for (v, _) in variants.iter() {
         if v.fields != syn::Fields::Unit {
             errors.push_back(format_err!("Variant cannot have fields"));

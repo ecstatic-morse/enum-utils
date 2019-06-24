@@ -3,18 +3,101 @@ use std::convert::{TryFrom, TryInto};
 use std::fmt;
 
 use failure::{bail, format_err, Fallible};
-use proc_macro2::TokenStream;
 
-pub fn reprs<'a>(attrs: impl 'a + Iterator<Item = &'a syn::Attribute>) -> Vec<TokenStream> {
-    attrs
-        .filter_map(|attr| {
-            if !attr.path.is_ident("repr") {
-                return None;
+#[derive(Debug, Clone, Copy)]
+pub enum Primitive {
+    U8,
+    U16,
+    U32,
+    U64,
+    U128,
+    Usize,
+    I8,
+    I16,
+    I32,
+    I64,
+    I128,
+    Isize,
+}
+
+impl TryFrom<&syn::Ident> for Primitive {
+    type Error = ();
+
+    fn try_from(ident: &syn::Ident) -> Result<Self, Self::Error> {
+        use self::Primitive::*;
+
+        match ident.to_string().as_str() {
+            "u8" => Ok(U8),
+            "u16" => Ok(U16),
+            "u32" => Ok(U32),
+            "u64" => Ok(U64),
+            "u128" => Ok(U128),
+            "usize" => Ok(Usize),
+            "i8" => Ok(I8),
+            "i16" => Ok(I16),
+            "i32" => Ok(I32),
+            "i64" => Ok(I64),
+            "i128" => Ok(I128),
+            "isize" => Ok(Isize),
+
+            _ => Err(()),
+        }
+    }
+}
+
+impl Primitive {
+    pub fn max_value(&self) -> Option<u128> {
+        use self::Primitive::*;
+
+        match self {
+            U8 => Some(u8::max_value() as u128),
+            U16 => Some(u16::max_value() as u128),
+            U32 => Some(u32::max_value() as u128),
+            U64 => Some(u64::max_value() as u128),
+            U128 => Some(u128::max_value()),
+            I8 => Some(i8::max_value() as u128),
+            I16 => Some(i16::max_value() as u128),
+            I32 => Some(i32::max_value() as u128),
+            I64 => Some(i64::max_value() as u128),
+            I128 => Some(i128::max_value() as u128),
+            Usize | Isize => None,
+        }
+    }
+}
+
+pub fn parse_primitive_repr<'a>(attrs: impl 'a + Iterator<Item = &'a syn::Attribute>)
+    -> Fallible<Option<(Primitive, syn::Ident)>>
+{
+    let mut repr = None;
+    for attr in attrs {
+        if !attr.path.is_ident("repr") {
+            continue;
+        }
+
+        let list = match attr.parse_meta()? {
+            syn::Meta::List(list) => list,
+            _ => continue,
+        };
+
+        debug_assert_eq!(list.ident, "repr");
+
+        // Iterate over `a` and `b` in `#[repr(a, b)]`
+        for arg in list.nested {
+            match &arg {
+                syn::NestedMeta::Meta(syn::Meta::Word(ident)) => {
+                    match ident.try_into() {
+                        Ok(_) if repr.is_some() =>
+                            bail!("Multiple primitive `#[repr(...)]`s"),
+                        Ok(prim) => repr = Some((prim, ident.clone())),
+                        Err(_) => continue,
+                    }
+                },
+                _ => continue,
             }
+        }
+    }
 
-            Some(attr.tts.clone())
-        })
-        .collect()
+    Ok(repr)
 }
 
 pub struct RenameRule(serde_derive_internals::attr::RenameRule);
@@ -210,6 +293,10 @@ pub struct Enum<'a> {
     pub name: &'a syn::Ident,
     pub attrs: EnumAttrs,
 
+    /// This will be `None` if no `#[repr]` was specified, or an error if parsing failed or
+    /// multiple `#[repr]`s were specified.
+    pub primitive_repr: Fallible<Option<(Primitive, syn::Ident)>>,
+
     pub variants: Vec<(&'a syn::Variant, VariantAttrs)>,
 
     /// None if the enum is not C-like
@@ -281,6 +368,8 @@ impl<'a> Enum<'a> {
             }
         }
 
+        let primitive_repr = parse_primitive_repr(input.attrs.iter());
+
         if !errors.is_empty() {
             return Err(errors);
         }
@@ -289,7 +378,14 @@ impl<'a> Enum<'a> {
             name: &input.ident,
             attrs: enum_attrs,
             variants: parsed_variants,
+            primitive_repr,
             discriminants,
         })
     }
+
+    /*
+    pub fn is_c_like(&self) -> bool {
+        self.discriminants.is_some()
+    }
+    */
 }
