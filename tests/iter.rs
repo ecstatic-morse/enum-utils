@@ -39,6 +39,22 @@ fn empty() {
                Empty::iter().collect::<Vec<Empty>>());
 }
 
+#[derive(Debug, Clone, IterVariants, PartialEq, Eq)]
+#[repr(u8)]
+enum SkipCLike {
+    A,
+    #[enumeration(skip)]
+    B,
+    C,
+}
+
+#[test]
+fn skip_c_like() {
+    use self::SkipCLike::*;
+    assert_eq!(vec![A, C],
+               SkipCLike::iter().collect::<Vec<_>>());
+}
+
 #[derive(Debug, IterVariants, PartialEq, Eq)]
 #[repr(C, u16)]
 #[repr(align(2))]
