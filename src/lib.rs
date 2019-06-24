@@ -198,7 +198,7 @@ pub fn from_str_derive(input: TokenStream) -> TokenStream {
 /// as a discriminant and will cause `IterVariants` to default to the `Clone`-based implementation.
 ///
 /// ```compile_fail
-/// #[derive(Debug, PartialEq, Eq, enum_utils::IterVariants)]
+/// #[derive(Debug, PartialEq, Eq, enum_utils::IterVariants)] // Missing `Clone` impl
 /// #[repr(u8)]
 /// pub enum Bitmask {
 ///     Bit1 = 1 << 0,
