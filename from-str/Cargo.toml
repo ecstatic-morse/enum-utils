@@ -12,5 +12,5 @@ tags = ["enum", "proc-macro", "derive"]
 categories = ["development-tools"]
 
 [dependencies]
-proc-macro2 = "0.4.29"
-quote = "0.6.12"
+proc-macro2 = "1.0"
+quote = "1.0"

@@ -11,9 +11,9 @@ phf = "0.7.24"
 libc = "0.2.54"
 
 [build-dependencies]
-quote = "0.6.12"
+quote = "1.0"
 phf_codegen = "0.7.24"
 enum-utils-from-str = { path = "../from-str" }
 cc = "1.0.36"
-proc-macro2 = "0.4.29"
+proc-macro2 = "1.0"
 

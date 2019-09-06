@@ -22,8 +22,8 @@ proc-macro = true
 
 [dependencies]
 failure = "0.1.5"
-proc-macro2 = "0.4.29"
-quote = "0.6.12"
+proc-macro2 = "1.0"
+quote = "1.0"
 enum-utils-from-str = { path = "from-str", version = "0.1.0" }
 serde_derive_internals = "0.24.1"
-syn = "0.15.33"
+syn = { version = "1.0", features = ["extra-traits"] }

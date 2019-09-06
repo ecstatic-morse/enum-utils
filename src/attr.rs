@@ -20,11 +20,13 @@ pub enum Primitive {
     Isize,
 }
 
-impl TryFrom<&syn::Ident> for Primitive {
+impl TryFrom<&syn::Path> for Primitive {
     type Error = ();
 
-    fn try_from(ident: &syn::Ident) -> Result<Self, Self::Error> {
+    fn try_from(path: &syn::Path) -> Result<Self, Self::Error> {
         use self::Primitive::*;
+
+        let ident = path.get_ident().ok_or(())?;
 
         match ident.to_string().as_str() {
             "u8" => Ok(U8),
@@ -66,7 +68,7 @@ impl Primitive {
 }
 
 pub fn parse_primitive_repr<'a>(attrs: impl 'a + Iterator<Item = &'a syn::Attribute>)
-    -> Fallible<Option<(Primitive, syn::Ident)>>
+    -> Fallible<Option<(Primitive, syn::Path)>>
 {
     let mut repr = None;
     for attr in attrs {
@@ -79,16 +81,16 @@ pub fn parse_primitive_repr<'a>(attrs: impl 'a + Iterator<Item = &'a syn::Attrib
             _ => continue,
         };
 
-        debug_assert_eq!(list.ident, "repr");
+        debug_assert!(list.path.is_ident("repr"));
 
         // Iterate over `a` and `b` in `#[repr(a, b)]`
-        for arg in list.nested {
-            match &arg {
-                syn::NestedMeta::Meta(syn::Meta::Word(ident)) => {
-                    match ident.try_into() {
+        for arg in &list.nested {
+            match arg {
+                syn::NestedMeta::Meta(syn::Meta::Path(path)) => {
+                    match path.try_into() {
                         Ok(_) if repr.is_some() =>
                             bail!("Multiple primitive `#[repr(...)]`s"),
-                        Ok(prim) => repr = Some((prim, ident.clone())),
+                        Ok(prim) => repr = Some((prim, path.clone())),
                         Err(_) => continue,
                     }
                 },
@@ -151,17 +153,15 @@ impl Attr {
 
     /// Returns an iterator over the items in `...` if this attribute looks like `#[enumeration(...)]`
     fn get_args(attr: &syn::Attribute) -> impl Iterator<Item = syn::NestedMeta> {
-        use syn::{Meta, MetaList};
+        use syn::{token, Meta, MetaList, NestedMeta};
 
-        match attr.parse_meta() {
-            Ok(Meta::List(MetaList { ident, nested, .. })) => if ident == "enumeration" {
+        if let Ok(Meta::List(MetaList { path, nested, .. })) = attr.parse_meta() {
+            if path.is_ident("enumeration") {
                 return nested.into_iter();
             }
-
-            _ => {}
         }
 
-        syn::punctuated::Punctuated::new().into_iter()
+        syn::punctuated::Punctuated::<NestedMeta, token::Comma>::new().into_iter()
     }
 }
 
@@ -182,25 +182,25 @@ impl TryFrom<&'_ syn::Meta> for Attr {
 
         match meta {
             // #[enumeration(skip)]
-            Meta::Word(ident) if ident == "skip" =>
+            Meta::Path(path) if path.is_ident("skip") =>
                 Ok(Attr::Skip),
 
             // #[enumeration(case_insensitive)]
-            Meta::Word(ident) if ident == "case_insensitive" =>
+            Meta::Path(path) if path.is_ident("case_insensitive") =>
                 Ok(Attr::CaseInsensitive),
 
             // #[enumeration(rename = "...")]
-            Meta::NameValue(MetaNameValue { ident, lit, .. }) if ident == "rename" =>
+            Meta::NameValue(MetaNameValue { path, lit, .. }) if path.is_ident("rename") =>
                 Ok(Attr::Rename(lit_val(lit)?)),
 
             // #[enumeration(rename_all = "...")]
-            Meta::NameValue(MetaNameValue { ident, lit, .. }) if ident == "rename_all" => {
+            Meta::NameValue(MetaNameValue { path, lit, .. }) if path.is_ident("rename_all") => {
                 let rule = lit_val(lit)?.parse().map_err(|_| format_err!("Invalid RenameAll rule"))?;
                 Ok(Attr::RenameAll(RenameRule(rule)))
             }
 
             // #[enumeration(alias = "...")]
-            Meta::NameValue(MetaNameValue { ident, lit, .. }) if ident == "alias" =>
+            Meta::NameValue(MetaNameValue { path, lit, .. }) if path.is_ident("alias") =>
                 Ok(Attr::Alias(lit_val(lit)?)),
 
             _ => bail!("Unknown attribute argument")
@@ -295,7 +295,7 @@ pub struct Enum<'a> {
 
     /// This will be `None` if no `#[repr]` was specified, or an error if parsing failed or
     /// multiple `#[repr]`s were specified.
-    pub primitive_repr: Fallible<Option<(Primitive, syn::Ident)>>,
+    pub primitive_repr: Fallible<Option<(Primitive, syn::Path)>>,
 
     pub variants: Vec<(&'a syn::Variant, VariantAttrs)>,
 
@@ -351,7 +351,7 @@ impl<'a> Enum<'a> {
                 match &v.discriminant {
                     // An integer literal
                     Some((_, Expr::Lit(ExprLit { lit: Lit::Int(i), .. }))) => {
-                        ds.push(i.value().try_into().expect("Variant overflowed i128"));
+                        ds.push(i.base10_parse::<i128>().expect("Variant overflowed i128"));
                     }
 
                     // An expr with an unknown value (e.g. a const defined elsewhere)

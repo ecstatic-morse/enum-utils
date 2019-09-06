@@ -9,11 +9,11 @@ use crate::attr::{Discriminant, Enum, ErrorList};
 enum IterImpl {
     Empty,
     Range {
-        repr: syn::Ident,
+        repr: syn::Path,
         range: Range<Discriminant>,
     },
     RangeInclusive {
-        repr: syn::Ident,
+        repr: syn::Path,
         range: RangeInclusive<Discriminant>,
     },
     Slice(Vec<TokenStream>),
@@ -30,7 +30,7 @@ impl IterImpl {
         if let Some(discriminants) = discriminants {
             let is_zst = discriminants.len() <= 1;
 
-            if let Ok(Some((repr, repr_ident))) = primitive_repr {
+            if let Ok(Some((repr, repr_path))) = primitive_repr {
                 let unskipped_discriminants: Vec<_> = discriminants
                     .iter()
                     .cloned()
@@ -50,13 +50,13 @@ impl IterImpl {
                         let end = *range.end();
                         if end < 0 || repr.max_value().map_or(false, |max| (end as u128) < max) {
                             return Ok(IterImpl::Range {
-                                repr: repr_ident.clone(),
+                                repr: repr_path.clone(),
                                 range: *range.start()..(end + 1),
                             })
                         }
 
                         return Ok(IterImpl::RangeInclusive {
-                            repr: repr_ident.clone(),
+                            repr: repr_path.clone(),
                             range,
                         })
                     }
