@@ -204,9 +204,6 @@ pub fn from_str_derive(input: TokenStream) -> TokenStream {
 ///     Bit1 = 1 << 0,
 ///     Bit2 = 1 << 1,
 /// }
-///
-/// use Bitmask::*;
-/// assert_eq!(Bitmask::iter().collect::<Vec<_>>(), vec![Empty, Full]);
 /// ```
 ///
 /// # Attributes
