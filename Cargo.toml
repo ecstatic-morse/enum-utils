@@ -11,6 +11,10 @@ license = "MIT"
 tags = ["enum", "proc-macro", "derive"]
 categories = ["development-tools"]
 
+[badges.azure-devops]
+project = "ecstaticmorse/enum-utils"
+pipeline = "enum-utils"
+
 [workspace]
 members = [
   "bench",
