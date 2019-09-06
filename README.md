@@ -1,5 +1,10 @@
 # enum-utils
 
+[![crates.io](https://img.shields.io/crates/v/enum-utils.svg)](https://crates.io/crates/enum-utils)
+[![docs.rs](https://docs.rs/enum-utils/badge.svg)](https://docs.rs/enum-utils)
+[![Build Status](https://dev.azure.com/ecstaticmorse/enum-utils/_apis/build/status/ecstatic-morse.enum-utils?branchName=master)](https://dev.azure.com/ecstaticmorse/enum-utils/_build/latest?definitionId=1&branchName=master)
+
+
 A set of procedural macros for deriving useful functionality on enums.
 
 See [the API docs] for more information.
