@@ -6,11 +6,12 @@ See [the API docs] for more information.
 
 [the API docs]: https://docs.rs/enum-utils
 
-## `FromStr`
+## [`FromStr`]
 
-An efficient, configurable [`FromStr`] implementation for C-like enums.
+An efficient, configurable [`FromStr`][from-str-std] implementation for C-like enums.
 
-[`FromStr`]: https://doc.rust-lang.org/std/str/trait.FromStr.html
+[`FromStr`]: https://docs.rs/enum-utils/0.1.1/enum_utils/derive.FromStr.html
+[from-str-std]: https://doc.rust-lang.org/std/str/trait.FromStr.html
 
 ```rust
 #[derive(Debug, PartialEq, enum_utils::FromStr)]
@@ -23,9 +24,11 @@ assert_eq!("Alpha".parse(), Ok(Test::Alpha));
 assert_eq!("Beta".parse(), Ok(Test::Beta));
 ```
 
-## `IterVariants`
+## [`IterVariants`]
 
 A static method returning an iterator over the variants of an enum.
+
+[`IterVariants`]: https://docs.rs/enum-utils/0.1.1/enum_utils/derive.IterVariants.html
 
 ```rust
 #[derive(Debug, PartialEq, Eq, enum_utils::IterVariants)]
@@ -41,10 +44,12 @@ use Direction::*;
 assert_eq!(Direction::iter().collect::<Vec<_>>(), vec![North, East, South, West]);
 ```
 
-## `TryFromRepr` and `ReprFrom`
+## [`TryFromRepr`] and [`ReprFrom`]
 
 Conversion to and from the discriminant of a C-like enum.
 
+[`ReprFrom`]: https://docs.rs/enum-utils/0.1.1/enum_utils/derive.ReprFrom.html
+[`TryFromRepr`]: https://docs.rs/enum-utils/0.1.1/enum_utils/derive.TryFromRepr.html
 
 ```rust
 use std::convert::TryInto;
