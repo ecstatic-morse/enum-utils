@@ -246,7 +246,7 @@ pub fn iter_variants_derive(input: TokenStream) -> TokenStream {
 /// # Examples
 ///
 /// ```
-/// use std::convert::TryInto;
+/// use std::convert::{TryFrom, TryInto};
 ///
 /// #[derive(Debug, Clone, Copy, PartialEq, Eq, enum_utils::TryFromRepr)]
 /// #[repr(u8)]
@@ -260,6 +260,8 @@ pub fn iter_variants_derive(input: TokenStream) -> TokenStream {
 /// use Direction::*;
 /// assert_eq!(North, 1u8.try_into().unwrap());
 /// assert_eq!(West,  4u8.try_into().unwrap());
+/// assert_eq!(Err(()), Direction::try_from(0u8));
+/// assert_eq!(Err(()), Direction::try_from(5u8));
 /// ```
 #[proc_macro_derive(TryFromRepr, attributes(enumeration))]
 pub fn try_from_repr_derive(input: TokenStream) -> TokenStream {
