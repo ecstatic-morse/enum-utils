@@ -1,7 +1,4 @@
-#![feature(repr_align_enum)]
-
 use enum_utils::IterVariants;
-
 
 #[derive(Debug, IterVariants, PartialEq, Eq)]
 #[repr(u32)]
