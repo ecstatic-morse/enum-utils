@@ -1,0 +1,23 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+strategy:
+  matrix:
+    stable:
+      rustup_toolchain: stable
+    beta:
+      rustup_toolchain: beta
+    nightly:
+      rustup_toolchain: nightly
+
+steps:
+  - script: |
+      curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $RUSTUP_TOOLCHAIN
+      echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+    displayName: Install rust
+  - script: sudo apt-get install gperf
+    displayName: Install gperf
+  - script: cargo build --all
+    displayName: Cargo build
+  - script: cargo test --all
+    displayName: Cargo test
