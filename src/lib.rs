@@ -237,8 +237,8 @@ pub fn iter_variants_derive(input: TokenStream) -> TokenStream {
     unwrap_errors(iter::derive(&ast)).into()
 }
 
-/// Derives [`TryFrom<Repr>`] for an enum, where `Repr` is a [primitive representation] specified
-/// in `#[repr(...)]`.
+/// Derives [`TryFrom<Repr>`] for a C-like enum, where `Repr` is a [primitive representation]
+/// specified in `#[repr(...)]`.
 ///
 /// [`TryFrom<Repr>`]: https://doc.rust-lang.org/std/convert/trait.TryFrom.html
 /// [primitive representation]: https://doc.rust-lang.org/reference/type-layout.html#primitive-representations
@@ -263,13 +263,25 @@ pub fn iter_variants_derive(input: TokenStream) -> TokenStream {
 /// assert_eq!(Err(()), Direction::try_from(0u8));
 /// assert_eq!(Err(()), Direction::try_from(5u8));
 /// ```
+///
+/// This macro only works on C-like enums.
+///
+/// ```compile_fail
+/// #[derive(Debug, Clone,  enum_utils::TryFromRepr)]
+/// #[repr(u8)]
+/// pub enum Letter {
+///     A,
+///     B,
+///     Other(u8),
+/// }
+/// ```
 #[proc_macro_derive(TryFromRepr, attributes(enumeration))]
 pub fn try_from_repr_derive(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     unwrap_errors(conv::derive_try_from_repr(&ast)).into()
 }
 
-/// Derives [`From<Enum>`] for the [primitive representation] specified in `#[repr(...)]`.
+/// Derives [`From<CLikeEnum>`] for the [primitive representation] specified in `#[repr(...)]`.
 ///
 /// [`From<Enum>`]: https://doc.rust-lang.org/std/convert/trait.From.html
 /// [primitive representation]: https://doc.rust-lang.org/reference/type-layout.html#primitive-representations
@@ -289,6 +301,18 @@ pub fn try_from_repr_derive(input: TokenStream) -> TokenStream {
 /// use Direction::*;
 /// assert_eq!(1u8, North.into());
 /// assert_eq!(4u8, West.into());
+/// ```
+///
+/// This macro only works on C-like enums.
+///
+/// ```compile_fail
+/// #[derive(Debug, Clone,  enum_utils::TryFromRepr)]
+/// #[repr(u8)]
+/// pub enum Letter {
+///     A,
+///     B,
+///     Other(u8),
+/// }
 /// ```
 #[proc_macro_derive(ReprFrom, attributes(enumeration))]
 pub fn repr_from_derive(input: TokenStream) -> TokenStream {
