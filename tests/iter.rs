@@ -38,6 +38,7 @@ fn empty() {
 
 #[derive(Debug, Clone, IterVariants, PartialEq, Eq)]
 #[repr(u8)]
+#[allow(unused)]
 enum SkipCLike {
     A,
     #[enumeration(skip)]
