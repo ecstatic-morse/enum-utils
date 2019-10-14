@@ -8,7 +8,6 @@ description = "Code generation for mapping from strings to arbitrary values"
 repository = "https://github.com/ecstatic-morse/enum-utils"
 readme = "../README.md"
 license = "MIT"
-tags = ["enum", "proc-macro", "derive"]
 categories = ["development-tools"]
 
 [dependencies]
