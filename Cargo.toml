@@ -1,6 +1,6 @@
 [package]
 name = "enum-utils"
-version = "0.1.1"
+version = "0.1.2" # remember to update html_root_url
 authors = ["Dylan MacKenzie <ecstaticmorse@gmail.com>"]
 edition = "2018"
 
@@ -26,7 +26,7 @@ proc-macro = true
 [dependencies]
 proc-macro2 = "1.0"
 quote = "1.0"
-enum-utils-from-str = { path = "from-str", version = "0.1.0" }
+enum-utils-from-str = { path = "from-str", version = "0.1.2" }
 serde_derive_internals = "0.25"
 syn = { version = "1.0", features = ["extra-traits"] }
 
@@ -34,3 +34,6 @@ syn = { version = "1.0", features = ["extra-traits"] }
 version = "0.1"
 default-features = false
 features = ["std"]
+
+[dev-dependencies]
+version-sync = "0.8"
