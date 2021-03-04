@@ -48,17 +48,17 @@ pub fn derive_try_from_repr(input: &syn::DeriveInput) -> Result<TokenStream, Err
         .map(|(v, ctor)|  quote!(const #v: #repr = #ctor as #repr));
 
     Ok(quote! {
-        impl ::std::convert::TryFrom<#repr> for #name {
+        impl ::core::convert::TryFrom<#repr> for #name {
             type Error = ();
 
             #[allow(non_upper_case_globals)]
-            fn try_from(d: #repr) -> Result<Self, Self::Error> {
+            fn try_from(d: #repr) -> ::core::result::Result<Self, Self::Error> {
 
                 #( #const_defs; )*
 
                 match d {
-                    #( #consts => Ok(#ctors), )*
-                    _ => Err(())
+                    #( #consts => ::core::result::Result::Ok(#ctors), )*
+                    _ => ::core::result::Result::Err(())
                 }
             }
         }
@@ -91,7 +91,7 @@ pub fn derive_repr_from(input: &syn::DeriveInput) -> Result<TokenStream, ErrorLi
     }
 
     Ok(quote! {
-        impl ::std::convert::From<#name> for #repr {
+        impl ::core::convert::From<#name> for #repr {
             fn from(d: #name) -> Self {
                 d as #repr
             }

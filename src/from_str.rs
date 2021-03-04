@@ -68,10 +68,10 @@ pub fn derive(ast: &syn::DeriveInput) -> Result<TokenStream, ErrorList> {
     }
 
     Ok(quote!{
-        impl ::std::str::FromStr for #enum_name {
+        impl ::core::str::FromStr for #enum_name {
             type Err = ();
 
-            fn from_str(s: &str) -> Result<Self, Self::Err> {
+            fn from_str(s: &str) -> ::core::result::Result<Self, Self::Err> {
                 #trie
                 _parse(s.as_bytes()).ok_or(())
             }

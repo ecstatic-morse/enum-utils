@@ -14,7 +14,6 @@ use proc_macro2::{Literal, Ident, TokenStream, Span};
 ///
 /// ```rust
 /// # #![recursion_limit="128"]
-/// # use quote::quote;
 /// use enum_utils_from_str::StrMapFunc;
 ///
 /// # fn main() {
@@ -30,7 +29,6 @@ use proc_macro2::{Literal, Ident, TokenStream, Span};
 ///
 /// // results in the following generated code.
 ///
-/// # let generated = quote! {
 /// fn custom_lookup(s: &[u8]) -> Option<bool> {
 ///     match s.len() {
 ///         2 => if s[0] == b'n' && s[1] == b'o' {
@@ -49,9 +47,6 @@ use proc_macro2::{Literal, Ident, TokenStream, Span};
 ///
 ///     None
 /// }
-/// # };
-///
-/// # assert_eq!(String::from_utf8(code).unwrap(), format!("{}", generated));
 /// # }
 /// ```
 #[derive(Clone)]
@@ -122,11 +117,11 @@ impl ToTokens for StrMapFunc {
                 _ => {}
             }
 
-            None
+            ::core::option::Option::None
         };
 
         tokens.extend(quote! {
-            fn #func_name(s: &[u8]) -> Option<#ret_ty> {
+            fn #func_name(s: &[u8]) -> ::core::option::Option<#ret_ty> {
                 #body
             }
         });
@@ -201,7 +196,7 @@ impl<T> Forest<T>
                     if let Some(v) = node.value {
                         // TODO: debug_assert_eq!(dfs.next().0, Post);
 
-                        tok.last_mut().unwrap().extend(quote!(return Some(#v);));
+                        tok.last_mut().unwrap().extend(quote!(return ::core::option::Option::Some(#v);));
                     }
                 }
 

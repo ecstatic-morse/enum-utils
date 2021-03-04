@@ -1,6 +1,6 @@
 //! A set of procedural macros for deriving useful functionality on enums.
 
-#![doc(html_root_url = "https://docs.rs/enum-utils/0.1.2")]
+#![doc(html_root_url = "https://docs.rs/enum-utils/0.1.3")]
 
 extern crate proc_macro;
 
