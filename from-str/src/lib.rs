@@ -14,7 +14,6 @@ use proc_macro2::{Literal, Ident, TokenStream, Span};
 ///
 /// ```rust
 /// # #![recursion_limit="128"]
-/// # use quote::quote;
 /// use enum_utils_from_str::StrMapFunc;
 ///
 /// # fn main() {
@@ -30,7 +29,6 @@ use proc_macro2::{Literal, Ident, TokenStream, Span};
 ///
 /// // results in the following generated code.
 ///
-/// # let generated = quote! {
 /// fn custom_lookup(s: &[u8]) -> Option<bool> {
 ///     match s.len() {
 ///         2 => if s[0] == b'n' && s[1] == b'o' {
@@ -49,9 +47,6 @@ use proc_macro2::{Literal, Ident, TokenStream, Span};
 ///
 ///     None
 /// }
-/// # };
-///
-/// # assert_eq!(String::from_utf8(code).unwrap(), format!("{}", generated));
 /// # }
 /// ```
 #[derive(Clone)]
