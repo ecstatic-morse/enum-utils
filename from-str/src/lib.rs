@@ -122,11 +122,11 @@ impl ToTokens for StrMapFunc {
                 _ => {}
             }
 
-            None
+            ::core::option::Option::None
         };
 
         tokens.extend(quote! {
-            fn #func_name(s: &[u8]) -> Option<#ret_ty> {
+            fn #func_name(s: &[u8]) -> ::core::option::Option<#ret_ty> {
                 #body
             }
         });
@@ -201,7 +201,7 @@ impl<T> Forest<T>
                     if let Some(v) = node.value {
                         // TODO: debug_assert_eq!(dfs.next().0, Post);
 
-                        tok.last_mut().unwrap().extend(quote!(return Some(#v);));
+                        tok.last_mut().unwrap().extend(quote!(return ::core::option::Option::Some(#v);));
                     }
                 }
 

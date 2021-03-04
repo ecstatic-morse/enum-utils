@@ -97,7 +97,7 @@ impl IterImpl {
     fn tokens(&self, ty: &syn::Ident) -> TokenStream {
         let body = match self {
             IterImpl::Empty => quote! {
-                ::std::iter::empty()
+                ::core::iter::empty()
             },
 
             IterImpl::Range { range, repr } => {
@@ -107,7 +107,7 @@ impl IterImpl {
                 quote! {
                     let start: #repr = #start;
                     let end: #repr = #end;
-                    (start .. end).map(|discrim| unsafe { ::std::mem::transmute(discrim) })
+                    (start .. end).map(|discrim| unsafe { ::core::mem::transmute(discrim) })
                 }
             },
 
@@ -117,7 +117,7 @@ impl IterImpl {
                 quote! {
                     let start: #repr = #start;
                     let end: #repr = #end;
-                    (start ..= end).map(|discrim| unsafe { ::std::mem::transmute(discrim) })
+                    (start ..= end).map(|discrim| unsafe { ::core::mem::transmute(discrim) })
                 }
             },
 
@@ -130,7 +130,7 @@ impl IterImpl {
 
         quote! {
             impl #ty {
-                fn iter() -> impl Iterator<Item = #ty> + Clone {
+                fn iter() -> impl ::core::iter::Iterator<Item = #ty> + ::core::clone::Clone {
                     #body
                 }
             }
