@@ -52,19 +52,3 @@ fn skip_c_like() {
     assert_eq!(vec![A, C],
                SkipCLike::iter().collect::<Vec<_>>());
 }
-
-#[derive(Debug, IterVariants, PartialEq, Eq)]
-#[repr(C, u16)]
-#[repr(align(2))]
-enum MultiRepr {
-    A,
-    B,
-}
-
-#[test]
-fn multi_repr() {
-    use self::MultiRepr::*;
-
-    assert_eq!(vec![A, B],
-               MultiRepr::iter().collect::<Vec<_>>());
-}
