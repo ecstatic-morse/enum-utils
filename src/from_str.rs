@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use failure::format_err;
+use anyhow::format_err;
 use proc_macro2::TokenStream;
 use quote::quote;
 

@@ -1,6 +1,6 @@
 use std::ops::{Range, RangeInclusive};
 
-use failure::format_err;
+use anyhow::format_err;
 use proc_macro2::{Literal, TokenStream};
 use quote::quote;
 
