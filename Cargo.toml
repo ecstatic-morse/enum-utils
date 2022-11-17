@@ -29,11 +29,7 @@ quote = "1.0"
 enum-utils-from-str = { path = "from-str", version = "0.1.2" }
 serde_derive_internals = "0.25"
 syn = { version = "1.0", features = ["extra-traits"] }
-
-[dependencies.failure]
-version = "0.1"
-default-features = false
-features = ["std"]
+anyhow = "1.0"
 
 [dev-dependencies]
 version-sync = "0.8"

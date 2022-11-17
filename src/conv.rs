@@ -1,4 +1,4 @@
-use failure::format_err;
+use anyhow::format_err;
 use proc_macro2::{TokenStream, Span};
 use quote::quote;
 

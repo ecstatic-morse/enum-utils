@@ -2,7 +2,7 @@ use std::collections::{BTreeSet, LinkedList};
 use std::convert::{TryFrom, TryInto};
 use std::fmt;
 
-use failure::{bail, format_err, Fallible};
+use anyhow::{bail, format_err, Result};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Primitive {
@@ -68,7 +68,7 @@ impl Primitive {
 }
 
 pub fn parse_primitive_repr<'a>(attrs: impl 'a + Iterator<Item = &'a syn::Attribute>)
-    -> Fallible<Option<(Primitive, syn::Path)>>
+    -> Result<Option<(Primitive, syn::Path)>>
 {
     let mut repr = None;
     for attr in attrs {
@@ -117,13 +117,13 @@ impl fmt::Debug for RenameRule {
     }
 }
 
-pub type ErrorList = LinkedList<failure::Error>;
+pub type ErrorList = LinkedList<anyhow::Error>;
 
 macro_rules! bail_list {
     ($msg:literal $( , $args:expr )* $(,)?) => {
         {
             let mut list = ErrorList::new();
-            list.push_back(failure::format_err!($msg, $($args),*));
+            list.push_back(anyhow::format_err!($msg, $($args),*));
             return Err(list);
         }
     }
@@ -139,7 +139,7 @@ pub enum Attr {
 }
 
 impl Attr {
-    pub fn parse_attrs(attr: &syn::Attribute) -> impl Iterator<Item = Fallible<Self>> {
+    pub fn parse_attrs(attr: &syn::Attribute) -> impl Iterator<Item = Result<Self>> {
         use syn::NestedMeta;
 
         Self::get_args(attr)
@@ -167,7 +167,7 @@ impl Attr {
 
 /// Parse an attr from the `syn::Meta` inside parens after "enumeration".
 impl TryFrom<&'_ syn::Meta> for Attr {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(meta: &syn::Meta) -> Result<Self, Self::Error> {
         use syn::{Lit, Meta, MetaNameValue};
@@ -217,7 +217,7 @@ pub struct VariantAttrs {
 
 impl VariantAttrs {
     pub fn from_attrs<T>(attrs: T) -> Result<Self, ErrorList>
-        where T: IntoIterator<Item = Fallible<Attr>>,
+        where T: IntoIterator<Item = Result<Attr>>,
     {
         let mut ret = VariantAttrs::default();
         let mut errors = ErrorList::default();
@@ -258,7 +258,7 @@ pub struct EnumAttrs {
 
 impl EnumAttrs {
     pub fn from_attrs<T>(attrs: T) -> Result<Self, ErrorList>
-        where T: IntoIterator<Item = Fallible<Attr>>,
+        where T: IntoIterator<Item = Result<Attr>>,
     {
         let mut ret = EnumAttrs::default();
         let mut errors = ErrorList::default();
@@ -295,7 +295,7 @@ pub struct Enum<'a> {
 
     /// This will be `None` if no `#[repr]` was specified, or an error if parsing failed or
     /// multiple `#[repr]`s were specified.
-    pub primitive_repr: Fallible<Option<(Primitive, syn::Path)>>,
+    pub primitive_repr: Result<Option<(Primitive, syn::Path)>>,
 
     pub variants: Vec<(&'a syn::Variant, VariantAttrs)>,
 
